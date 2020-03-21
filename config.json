@@ -1,0 +1,28 @@
+{
+  "app": "dev-canvas",
+  "entrypoints": [
+    {
+      "title": "Application Sample",
+      "text": "Sample page",
+      "icon": "sap-icon--approvals",
+      "router": "/glory/sample/page"
+    },
+    {
+      "title": "URL Sample",
+      "text": "Google search",
+      "icon": "sap-icon--search",
+      "url": "https://www.google.com"
+    }
+  ],
+  "fragments": [
+    {
+      "name": "dev-canvasReactFragmentSample1",
+      "section": ["Integration", "Claims"]
+    },
+    {
+      "name": "dev-canvasReactFragmentSample2",
+      "section": ["Integration"]
+    }
+  ],
+  "routers": ["/canvas"]
+}
