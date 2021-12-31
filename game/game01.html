@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#000000" />
+  <meta name="description" content=" Game Ranking" />
+  <title>
+    Game Ranking
+  </title>
+
+  <style>
+    body{
+      margin-top: 0;
+      
+      max-width: 300px;
+      width: 100%;
+      height: 100%;
+    }
+    .rank-container {
+      background-color: #000;
+    }
+
+    .rank-container > h3.title{
+      color: #fff;
+      width: 100%;
+      height: 100%;
+    }
+    #rank-list {
+      color: #fff;
+    }
+  </style>
+</head>
+
+<body>
+  <noscript>You need to enable JavaScript to run this game ranking app.</noscript>
+  <div id="game-rank-app" style="width: 100%; height: 100%">
+    <div class="rank-container" >
+      <h3 class="title">Rank List</h3>
+      <ul id="rank-list">
+      </ul>
+    </div>
+  </div>
+  <script text="text/javscript">
+    var FetchTimerID = 0;
+    var RankDataUrl = 'https://live.pubg8x.com/api/data/tournament_pdl?type=final_team_totalpoints&range=match&format=xml&tournament_id=178';
+    // var RankDataUrl = '/xml/rank-data.xml?rank=test'
+    
+    function getRandomNumber(){
+      return Math.random().toString().slice(2, 5 + 2)
+    }
+
+    function getItemValue(item, name){
+
+      var props = item && item.getElementsByTagName(name);
+      if (!props.length > 0){ 
+        return '';
+      }
+
+      return props[0].textContent;
+    }
+
+    function fetchRankData(url) {
+      if(!window.XMLHttpRequest){
+        console.log('Error: You browser does not support XMLHttpRequest!!!')
+        return;
+      }
+
+      var rankList = document.getElementById('rank-list');
+      var rankItems = '';
+      var xhr = new XMLHttpRequest();
+
+      xhr.onload = function () {
+        console.log(xhr.responseXML);
+        var rankData = xhr.responseXML;
+        var items = rankData.documentElement.getElementsByTagName("item");
+        rankItems = '';
+        for (var i = 0; i < items.length; i++) {
+          console.log(items[i]);
+          var currentItem = items[i];
+          var rank = getItemValue(currentItem, 'rank') || '';
+          var teamName = getItemValue(currentItem, 'teamname') || '';
+          var totalPoints = getItemValue(currentItem, 'totalpoints') || '';
+          var life = getItemValue(currentItem, 'knockdown') || '';
+          var kills = getItemValue(currentItem, 'killpoints') || '';
+          console.log(rank);
+          rankItems += '<li> Rank: '+ rank + ' | Team: '+ teamName+ ' | PT: ' + totalPoints + ' | Life: ' + life + ' | Kill: ' + kills + ' </li>'
+        }
+        rankList.innerHTML = rankItems;
+        fetchRankTimer(10 * 1000);
+      }
+
+      xhr.onerror = function () {
+        console.log("Error while getting XML.");
+        fetchRankTimer(10 * 1000);
+      }
+
+      xhr.open("GET", url);
+      xhr.responseType = "document";
+      xhr.send();
+    }
+    
+    function fetchRankTimer(delay) {
+      clearTimeout(FetchTimerID);
+      FetchTimerID = setTimeout(function() {
+        fetchRankData(RankDataUrl + '&random=' + getRandomNumber());
+      }, delay);
+    }
+
+    fetchRankData(RankDataUrl + '&random=' + getRandomNumber());
+    
+  </script>
+</body>
+
+</html>
