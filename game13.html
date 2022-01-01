@@ -20,7 +20,7 @@
     }
 
     body {
-      font-family: 'headlinerno';
+      font-family: 'headlinerno','Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       margin-top: 0;
       max-width: 285px;
       width: 100%;
@@ -178,19 +178,23 @@
           var currentItem = items[i];
           var rank = getItemValue(currentItem, 'rank') || '';
           var teamName = getItemValue(currentItem, 'teamname') || '';
-          var totalPoints = getItemValue(currentItem, 'points') || '';
-          var life = getItemValue(currentItem, 'knockdowns') || '';
-          var kills = getItemValue(currentItem, 'kills') || '';
+          var totalPoints = getItemValue(currentItem, 'totalpoints') || '';
+          var life = getItemValue(currentItem, 'numberofwins') || '';
+          var player1 = getItemValue(currentItem, 'alivestateplayer1') || '';
+          var player2 = getItemValue(currentItem, 'alivestateplayer2') || '';
+          var player3 = getItemValue(currentItem, 'alivestateplayer3') || '';
+          var player4 = getItemValue(currentItem, 'alivestateplayer4') || '';
+          var kills = getItemValue(currentItem, 'totalkillpoints') || '';
           console.log(rank);
           rankItems += '<li><span class="rank">' + rank + '</span><span class="team">' + teamName + '</span><span class="pt">' + totalPoints + '</span><span class="life">' + life + '</span><span class="kill">' + kills + '</span></li>'
         }
         rankList.innerHTML = rankItems;
-        fetchRankTimer(3 * 1000);
+        // fetchRankTimer(3 * 1000);
       }
 
       xhr.onerror = function () {
         console.log("Error while getting XML.");
-        fetchRankTimer(3 * 1000);
+        // fetchRankTimer(3 * 1000);
       }
 
       xhr.open("GET", url);
