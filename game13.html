@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#000000" />
+  <meta name="description" content=" Game Ranking" />
+  <title>
+    Game Ranking
+  </title>
+
+  <style>
+    @font-face {
+      font-family: 'headlinerno';
+      src: url('/HEADLINERNO.45 DEMO.TTF');
+      src: url('/HEADLINERNO.45 DEMO.TTF') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+    }
+
+    body {
+      font-family: 'headlinerno';
+      margin-top: 0;
+      max-width: 285px;
+      width: 100%;
+      height: 100%;
+    }
+
+    .rank-container {
+      /* background-color: rgba(25, 25, 26, 0.8); */
+      background-image: url('/game-bg.png');
+      background-repeat: no-repeat;
+      height: 645px;
+      width: 291px;
+    }
+
+    .rank-container>.rank-header {
+      max-width: 285px;
+      width: 100%;
+      height: 50px;
+      margin-top: 0;
+      margin-bottom: 0;
+      font-family: headlinerno;
+      /* background-image: url('/rankheader.png');
+      background-repeat: no-repeat; */
+      background-size: contain;
+    }
+
+    .rank-header>span {
+      height: 50px;
+      display: inline-block;
+      font-size: 30px;
+      line-height: 58px;
+    }
+
+    .rank-header>span.team-title {
+      margin-left: 41px;
+    }
+
+    .rank-header>span.pt-title {
+      margin-left: 29px;
+    }
+
+    .rank-header>span.life-title {
+      margin-left: 32px;
+    }
+
+    .rank-header>span.kill-title {
+      margin-left: 31px;
+    }
+
+    #rank-list {
+      color: #fff;
+      margin-left: 20px;
+      padding-left: 0;
+      margin-top: 0;
+    }
+
+    #rank-list>li {
+      /* color: #c0b5ae; */
+      color: rgb(190, 178, 171);
+      list-style-type: none;
+      margin-bottom: 10px;
+      height: 27px;
+      line-height: 35px;
+      font-size: 21px;
+    }
+
+    #rank-list>li>span {
+
+      font-family: 'headlinerno';
+      display: inline-block;
+    }
+
+    #rank-list>li>span.rank {
+      width: 20px;
+    }
+
+    #rank-list>li>span.team {
+      width: 60px;
+      text-align: center;
+    }
+
+    #rank-list>li>span.pt {
+      width: 50px;
+      text-align: center;
+    }
+
+    #rank-list>li>span.life {
+      width: 60px;
+      text-align: center;
+    }
+
+    #rank-list>li>span.kill {
+      width: 60px;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <noscript>You need to enable JavaScript to run this game ranking app.</noscript>
+  <div id="game-rank-app" style="width: 100%; height: 100%">
+    <div class="rank-container">
+      <div class="rank-header">
+        <span class='team-title'>TEAM</span>
+        <span class='pt-title'>PT</span>
+        <span class='life-title'>LIFE</span>
+        <span class='kill-title'>KILL</span>
+      </div>
+      <ul id="rank-list">
+      </ul>
+    </div>
+  </div>
+  <script text="text/javscript">
+    var FetchTimerID = 0;
+    var RankDataUrl = 'https://live.pubg8x.com/api/data/tournament_pdl?type=live_survive&live=1&format=xml&tournament_id=178';
+    //  old url: https://live.pubg8x.com/api/data/tournament_pdl?type=final_team_totalpoints&range=match&format=xml&tournament_id=178
+    // 实时数据xml：
+    // 本场存活和积分：https://live.pubg8x.com/api/data/tournament_pdl?type=live_survive&live=1&format=xml&tournament_id=178
+    // 本场存活和今日积分：https://live.pubg8x.com/api/data/tournament_pdl?type=live_team1&live=1&format=xml&tournament_id=178
+    // 本场存活和阶段积分：https://live.pubg8x.com/api/data/tournament_pdl?type=live_team2&live=1&format=xml&tournament_id=178
+
+    // var RankDataUrl = '/xml/rank-data.xml?rank=test'
+
+    function getRandomNumber() {
+      return Math.random().toString().slice(2, 5 + 2)
+    }
+
+    function getItemValue(item, name) {
+
+      var props = item && item.getElementsByTagName(name);
+      if (!props.length > 0) {
+        return '';
+      }
+
+      return props[0].textContent;
+    }
+
+    function fetchRankData(url) {
+      if (!window.XMLHttpRequest) {
+        console.log('Error: You browser does not support XMLHttpRequest!!!')
+        return;
+      }
+
+      var rankList = document.getElementById('rank-list');
+      var rankItems = '';
+      var xhr = new XMLHttpRequest();
+
+      xhr.onload = function () {
+        console.log(xhr.responseXML);
+        var rankData = xhr.responseXML;
+        var items = rankData.documentElement.getElementsByTagName("item");
+        rankItems = '';
+        for (var i = 0; i < items.length; i++) {
+          console.log(items[i]);
+          var currentItem = items[i];
+          var rank = getItemValue(currentItem, 'rank') || '';
+          var teamName = getItemValue(currentItem, 'teamname') || '';
+          var totalPoints = getItemValue(currentItem, 'points') || '';
+          var life = getItemValue(currentItem, 'knockdowns') || '';
+          var kills = getItemValue(currentItem, 'kills') || '';
+          console.log(rank);
+          rankItems += '<li><span class="rank">' + rank + '</span><span class="team">' + teamName + '</span><span class="pt">' + totalPoints + '</span><span class="life">' + life + '</span><span class="kill">' + kills + '</span></li>'
+        }
+        rankList.innerHTML = rankItems;
+        fetchRankTimer(3 * 1000);
+      }
+
+      xhr.onerror = function () {
+        console.log("Error while getting XML.");
+        fetchRankTimer(3 * 1000);
+      }
+
+      xhr.open("GET", url);
+      xhr.responseType = "document";
+      xhr.send();
+    }
+
+    function fetchRankTimer(delay) {
+      clearTimeout(FetchTimerID);
+      FetchTimerID = setTimeout(function () {
+        fetchRankData(RankDataUrl + '&random=' + getRandomNumber());
+      }, delay);
+    }
+
+    fetchRankData(RankDataUrl + '&random=' + getRandomNumber());
+
+  </script>
+</body>
+
+</html>
