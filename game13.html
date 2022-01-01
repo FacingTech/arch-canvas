@@ -20,7 +20,7 @@
     }
 
     body {
-      font-family: 'headlinerno','Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'headlinerno', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       margin-top: 0;
       max-width: 285px;
       width: 100%;
@@ -50,24 +50,24 @@
     .rank-header>span {
       height: 50px;
       display: inline-block;
-      font-size: 30px;
+      font-size: 29px;
       line-height: 58px;
     }
 
     .rank-header>span.team-title {
-      margin-left: 41px;
+      margin-left: 45px;
     }
 
     .rank-header>span.pt-title {
-      margin-left: 29px;
+      margin-left: 30px;
     }
 
     .rank-header>span.life-title {
-      margin-left: 32px;
+      margin-left: 33px;
     }
 
     .rank-header>span.kill-title {
-      margin-left: 31px;
+      margin-left: 28px;
     }
 
     #rank-list {
@@ -84,7 +84,7 @@
       margin-bottom: 10px;
       height: 27px;
       line-height: 35px;
-      font-size: 21px;
+      font-size: 24px;
     }
 
     #rank-list>li>span {
@@ -94,27 +94,51 @@
     }
 
     #rank-list>li>span.rank {
-      width: 20px;
+      width: 16px;
     }
 
     #rank-list>li>span.team {
-      width: 60px;
+      width: 65px;
+      max-width: 65px;
       text-align: center;
     }
 
     #rank-list>li>span.pt {
-      width: 50px;
+      width: 55px;
+      max-width: 55px;
       text-align: center;
     }
 
     #rank-list>li>span.life {
-      width: 60px;
+      width: 62px;
+      max-width: 62px;
       text-align: center;
+      line-height: 40px;
     }
 
     #rank-list>li>span.kill {
       width: 60px;
       text-align: center;
+    }
+
+    #rank-list em.player {
+      width: 3px;
+      height: 14px;
+      background-color: orange;
+      display: inline-block;
+      margin-left: 3px;
+    }
+
+    #rank-list em.player.alive {
+      background-color: orange;
+    }
+
+    #rank-list em.player.dead {
+      background-color: grey;
+    }
+
+    #rank-list em.player.knockdown {
+      background-color: red;
     }
   </style>
 </head>
@@ -149,13 +173,31 @@
     }
 
     function getItemValue(item, name) {
-
       var props = item && item.getElementsByTagName(name);
       if (!props.length > 0) {
         return '';
       }
 
       return props[0].textContent;
+    }
+
+    function detectPlayerState(player) {
+      var state = 'alive';
+      if (player) {
+        if (player === '0') {
+          state = 'alive';
+        } else if (player === '1') {
+          state = 'knockdown';
+        } else if (player === '3') {
+          state = 'dead';
+        } else {
+          state = 'alive'
+        }
+
+      } else {
+        state = 'dead';
+      }
+      return state;
     }
 
     function fetchRankData(url) {
@@ -165,36 +207,47 @@
       }
 
       var rankList = document.getElementById('rank-list');
-      var rankItems = '';
+      var rankItemsHTML = '';
+      var lifeHTML = '';
       var xhr = new XMLHttpRequest();
 
       xhr.onload = function () {
         console.log(xhr.responseXML);
         var rankData = xhr.responseXML;
         var items = rankData.documentElement.getElementsByTagName("item");
-        rankItems = '';
-        for (var i = 0; i < items.length; i++) {
-          console.log(items[i]);
-          var currentItem = items[i];
-          var rank = getItemValue(currentItem, 'rank') || '';
+        console.log(items);
+        var sortedItems = Array.from(items).sort(function (a, b) {
+          var rankA = getItemValue(a, 'totalpoints') || '0';
+          var rankB = getItemValue(b, 'totalpoints') || '0';
+          return parseInt(rankB) - parseInt(rankA);
+        });
+
+        rankItemsHTML = '';
+        for (var i = 0; i < sortedItems.length; i++) {
+          console.log(sortedItems[i]);
+          lifeHTML = '';
+          var currentItem = sortedItems[i];
+          // var rank = getItemValue(currentItem, 'rank') || '';
+          var rank = i + 1;
           var teamName = getItemValue(currentItem, 'teamname') || '';
           var totalPoints = getItemValue(currentItem, 'totalpoints') || '';
           var life = getItemValue(currentItem, 'numberofwins') || '';
-          var player1 = getItemValue(currentItem, 'alivestateplayer1') || '';
-          var player2 = getItemValue(currentItem, 'alivestateplayer2') || '';
-          var player3 = getItemValue(currentItem, 'alivestateplayer3') || '';
-          var player4 = getItemValue(currentItem, 'alivestateplayer4') || '';
+          var player1 = detectPlayerState(getItemValue(currentItem, 'alivestateplayer1'));
+          var player2 = detectPlayerState(getItemValue(currentItem, 'alivestateplayer2'));
+          var player3 = detectPlayerState(getItemValue(currentItem, 'alivestateplayer3'));
+          var player4 = detectPlayerState(getItemValue(currentItem, 'alivestateplayer4'));
+          // console.log(player1, player2, player3, player4);
+          lifeHTML = '<em class="player player1 ' + player1 + '"></em><em class="player player2 ' + player2 + '""></em><em class="player player3 ' + player3 + '""></em><em class="player player4 ' + player4 + '""></em>';
           var kills = getItemValue(currentItem, 'totalkillpoints') || '';
-          console.log(rank);
-          rankItems += '<li><span class="rank">' + rank + '</span><span class="team">' + teamName + '</span><span class="pt">' + totalPoints + '</span><span class="life">' + life + '</span><span class="kill">' + kills + '</span></li>'
+          rankItemsHTML += '<li><span class="rank">' + rank + '</span><span class="team">' + teamName + '</span><span class="pt">' + totalPoints + '</span><span class="life">' + lifeHTML + '</span><span class="kill">' + kills + '</span></li>'
         }
-        rankList.innerHTML = rankItems;
-        // fetchRankTimer(3 * 1000);
+        rankList.innerHTML = rankItemsHTML;
+        fetchRankTimer(3 * 1000);
       }
 
       xhr.onerror = function () {
         console.log("Error while getting XML.");
-        // fetchRankTimer(3 * 1000);
+        fetchRankTimer(3 * 1000);
       }
 
       xhr.open("GET", url);
