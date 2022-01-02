@@ -260,12 +260,12 @@
           rankItemsHTML += '<li class="'+  allPlayers +'"><span class="rank">' + rank + '</span><span class="team">' + teamName + '</span><span class="pt">' + totalPoints + '</span>' + lifeHTML + '<span class="kill">' + kills + '</span></li>'
         }
         rankList.innerHTML = rankItemsHTML;
-        fetchRankTimer(3 * 1000);
+        fetchRankTimer(1 * 1000);
       }
 
       xhr.onerror = function () {
         console.log("Error while getting XML.");
-        fetchRankTimer(3 * 1000);
+        fetchRankTimer(1 * 1000);
       }
 
       xhr.open("GET", url);
