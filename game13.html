@@ -72,29 +72,40 @@
 
     #rank-list {
       color: #fff;
-      margin-left: 20px;
+      margin-left: 7px;
       padding-left: 0;
       margin-top: 0;
     }
 
     #rank-list>li {
       /* color: #c0b5ae; */
-      color: rgb(190, 178, 171);
+      color: #beb2ab;
       list-style-type: none;
-      margin-bottom: 10px;
-      height: 27px;
+      margin-bottom: 2px;
+      height: 35px;
       line-height: 35px;
       font-size: 24px;
+      width: 275px;
+    }
+
+    #rank-list>li:nth-child(1) {
+      margin-bottom: 0;
+    }
+
+    #rank-list>li.allout {
+      /* color: #c0b5ae; */
+      background-color: #080806 !important;
+      color: #4e4c53;
     }
 
     #rank-list>li>span {
-
       font-family: 'headlinerno';
       display: inline-block;
     }
 
     #rank-list>li>span.rank {
       width: 16px;
+      margin-left: 13px;
     }
 
     #rank-list>li>span.team {
@@ -113,7 +124,7 @@
       width: 62px;
       max-width: 62px;
       text-align: center;
-      line-height: 40px;
+      line-height: 38px;
     }
 
     #rank-list>li>span.kill {
@@ -134,7 +145,7 @@
     }
 
     #rank-list em.player.dead {
-      background-color: grey;
+      background-color: #4e4c53;
     }
 
     #rank-list em.player.knockdown {
@@ -182,16 +193,16 @@
     }
 
     function detectPlayerState(player) {
-      var state = 'alive';
+      var state = 'dead';
       if (player) {
         if (player === '0') {
-          state = 'alive';
+          state = 'dead';
         } else if (player === '1') {
           state = 'knockdown';
         } else if (player === '3') {
-          state = 'dead';
+          state = 'alive';
         } else {
-          state = 'alive'
+          state = 'dead'
         }
 
       } else {
@@ -236,10 +247,16 @@
           var player2 = detectPlayerState(getItemValue(currentItem, 'alivestateplayer2'));
           var player3 = detectPlayerState(getItemValue(currentItem, 'alivestateplayer3'));
           var player4 = detectPlayerState(getItemValue(currentItem, 'alivestateplayer4'));
+          var allPlayers = 'normal';
           // console.log(player1, player2, player3, player4);
-          lifeHTML = '<em class="player player1 ' + player1 + '"></em><em class="player player2 ' + player2 + '""></em><em class="player player3 ' + player3 + '""></em><em class="player player4 ' + player4 + '""></em>';
+
+          if (player1 === 'dead' && player2 === 'dead' && player3 === 'dead' && player4 === 'dead') {
+            allPlayers = 'allout';
+          }
+
+          lifeHTML = '<span class="life"><em class="player player1 ' + player1 + '"></em><em class="player player2 ' + player2 + '""></em><em class="player player3 ' + player3 + '""></em><em class="player player4 ' + player4 + '""></em></span>';
           var kills = getItemValue(currentItem, 'totalkillpoints') || '';
-          rankItemsHTML += '<li><span class="rank">' + rank + '</span><span class="team">' + teamName + '</span><span class="pt">' + totalPoints + '</span><span class="life">' + lifeHTML + '</span><span class="kill">' + kills + '</span></li>'
+          rankItemsHTML += '<li class="'+  allPlayers +'"><span class="rank">' + rank + '</span><span class="team">' + teamName + '</span><span class="pt">' + totalPoints + '</span>' + lifeHTML + '<span class="kill">' + kills + '</span></li>'
         }
         rankList.innerHTML = rankItemsHTML;
         fetchRankTimer(3 * 1000);
