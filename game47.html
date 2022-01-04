@@ -233,6 +233,10 @@
           var rankB = getItemValue(b, 'totalpoints') || '0';
           return parseInt(rankB) - parseInt(rankA);
         });
+        
+        if(sortedItems.length > 16) {
+          sortedItems.splice(16, sortedItems.length - 16)
+        }
 
         rankItemsHTML = '';
         for (var i = 0; i < sortedItems.length; i++) {
